@@ -1,0 +1,31 @@
+html {
+  width: 100vw;
+  max-width: 100%;
+}
+
+html, ::after, ::before {
+  box-sizing: border-box;
+  height: 100%;
+  font-family: 'Inter UI', 'Helvetica', sans-serif;
+  font-size: 12px;
+  line-height: 22px;
+  color: #000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.main {
+  max-width: 1010px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  padding-top: 21px;
+  margin: 21px auto;
+  border: 1px solid #827E7E;
+}
