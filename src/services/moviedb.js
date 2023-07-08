@@ -10,35 +10,37 @@ export default class MovieService {
     },
   }
 
+  _transformMovie(movie) {
+    return {
+      id: movie.id,
+      title: movie.title,
+      posterPath: movie.poster_path,
+      date: movie.release_date,
+      overview: movie.overview,
+    }
+  }
+
   async getResource(url, options) {
     const res = await fetch(`${this._apiBase}${url}`, options)
 
     if (!res.ok) {
-      throw new Error(`could not fetch ${url}, received status ${res.status}`)
+      console.log(res.statusText)
+      throw new Error(`Данные не загружены. Код ошибки ${res.status}`)
     }
     return await res.json()
   }
 
   async getTopMovies(page = 1) {
-    const topMovies = await this.getResource(`/movie/top_rated?language=en-US&page=${page}`, this.options)
-    // const topMovies = res.results
+    let topMovies = await this.getResource(`/movie/top_rated?language=en-US&page=${page}`, this.options)
+    // topMovies = topMovies.results
     // console.log(topMovies)
-    return topMovies
+    return topMovies.results.map(this._transformMovie)
   }
 
   async getPopularMovies(page = 1) {
-    const res = await this.getResource(`/movie/popular?language=en-US&page=${page}`, this.options)
-    const popularMovies = res.results
+    const popularMovies = await this.getResource(`/movie/popular?language=en-US&page=${page}`, this.options)
+    // const popularMovies = res.results
+    console.log(popularMovies)
     return popularMovies
   }
 }
-
-// const resource = new MovieService()
-// resource.getTopMovies().then((movies) => {
-//   movies.forEach((movie) => {
-// const movieRequired = {
-
-// }
-// console.log(movie)
-//   })
-// })

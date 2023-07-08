@@ -27,5 +27,8 @@ html, ::after, ::before {
   justify-content: space-evenly;
   padding-top: 21px;
   margin: 21px auto;
-  border: 1px solid #827E7E;
+}
+
+.main--loading {
+  padding-top: 100px;
 }

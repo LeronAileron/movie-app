@@ -2,10 +2,14 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 
-import MovieService from './services/moviedb'
 import './index.css'
-import MovieCard from './components/movie-card'
+import MovieService from './services/moviedb'
+import MoviesLayout from './components/movies-layout'
+import Error from './components/error'
+import Spinner from './components/spinner'
+import checkConnected from './functions/check-connected'
 
+checkConnected
 class App extends React.Component {
   movieResource = new MovieService()
 
@@ -13,52 +17,54 @@ class App extends React.Component {
     error: null,
     isLoaded: false,
     movies: [],
-    page: null,
+    page: 5,
+    internetConnection: true,
+  }
+
+  onMoviesLoaded = (movies) => {
+    this.setState({
+      movies,
+      isLoaded: true,
+    })
+  }
+
+  onChangeConnectionStatus = () => {
+    this.setState(({ internetConnection }) => ({
+      internetConnection: !internetConnection,
+    }))
   }
 
   componentDidMount() {
-    this.movieResource.getTopMovies().then(
-      (movies) => {
-        this.setState({
-          isLoaded: true,
-          movies: movies.results,
-          page: movies.page,
-        })
-      },
-      (error) => {
-        this.setState({
-          isLoaded: true,
-          error,
-        })
-      }
-    )
+    const { page } = this.state
+    this.movieResource.getTopMovies(page).then(this.onMoviesLoaded, (error) => {
+      this.setState({
+        isLoaded: true,
+        error,
+      })
+    })
   }
 
   render() {
-    // const { error, isLoaded, movies, page } = this.state
-    const { error, isLoaded, movies } = this.state
+    const { error, isLoaded, movies, internetConnection } = this.state
     console.log(this.state)
-    if (error) {
-      return <div className=" main main--error">Ошибка: {error.message}</div>
-    } else if (!isLoaded) {
-      return <div className="main main--loading">Загрузка...</div>
-    } else {
-      const movieCards = movies.map((movie) => {
-        const { id, title, poster_path, release_date, overview } = movie
 
-        return (
-          <MovieCard
-            key={id}
-            id={id}
-            title={title}
-            poster_path={poster_path}
-            date={release_date}
-            description={overview}
-          />
-        )
-      })
-      return <main className="main">{movieCards}</main>
+    checkConnected(this.onChangeConnectionStatus, internetConnection)
+
+    if (!internetConnection) {
+      return <Error message="You're offline right now. Check your connection." />
     }
+
+    const errorHere = error ? <Error message={error.message} type="warning" /> : null
+    const spinner = !isLoaded ? <Spinner /> : null
+    const content = isLoaded && !error ? <MoviesLayout movies={movies} /> : null
+
+    return (
+      <>
+        {errorHere}
+        {spinner}
+        {content}
+      </>
+    )
   }
 }
 
@@ -67,3 +73,13 @@ const elem = <App />
 const rootElement = document.getElementById('root')
 const root = createRoot(rootElement)
 root.render(elem)
+
+// const CheckConnected = ({ onChangeConnectionStatus }) => {
+// window.ononline = () => {
+//   onChangeConnectionStatus()
+// }
+
+// window.onoffline = () => {
+//   onChangeConnectionStatus()
+// }
+// }

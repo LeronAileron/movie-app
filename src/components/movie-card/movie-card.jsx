@@ -4,18 +4,21 @@ import { format, parseISO } from 'date-fns'
 
 import './movie-card.css'
 
-const MovieCard = ({ id, title, date, description, poster_path }) => {
-  const imgSrc = `https://image.tmdb.org/t/p/original${poster_path}`
+const MovieCard = ({ id, title, date, description, posterPath }) => {
+  const imgSrc = `https://image.tmdb.org/t/p/original${posterPath}`
   const alt = `Постер к фильму "${title}" `
+
   const releaseDate = parseISO(date)
   const release = format(releaseDate, 'MMMM d, yyyy')
 
-  let shortDescription
+  const shortDescription = getShortDescription()
 
-  if (title.length > 21) {
-    shortDescription = cutDescription(144)
-  } else {
-    shortDescription = cutDescription(185)
+  function getShortDescription() {
+    if (title.length > 21) {
+      return cutDescription(144)
+    } else {
+      return cutDescription(185)
+    }
   }
 
   function cutDescription(stop) {
