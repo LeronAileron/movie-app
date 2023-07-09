@@ -1,15 +1,14 @@
 /* eslint-disable quotes */
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { Offline, Online } from 'react-detect-offline'
 
 import './index.css'
 import MovieService from './services/moviedb'
 import MoviesLayout from './components/movies-layout'
 import Error from './components/error'
 import Spinner from './components/spinner'
-import checkConnected from './functions/check-connected'
 
-checkConnected
 class App extends React.Component {
   movieResource = new MovieService()
 
@@ -17,8 +16,7 @@ class App extends React.Component {
     error: null,
     isLoaded: false,
     movies: [],
-    page: 5,
-    internetConnection: true,
+    page: 1,
   }
 
   onMoviesLoaded = (movies) => {
@@ -45,14 +43,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { error, isLoaded, movies, internetConnection } = this.state
-    console.log(this.state)
-
-    checkConnected(this.onChangeConnectionStatus, internetConnection)
-
-    if (!internetConnection) {
-      return <Error message="You're offline right now. Check your connection." />
-    }
+    const { error, isLoaded, movies } = this.state
 
     const errorHere = error ? <Error message={error.message} type="warning" /> : null
     const spinner = !isLoaded ? <Spinner /> : null
@@ -60,9 +51,14 @@ class App extends React.Component {
 
     return (
       <>
-        {errorHere}
-        {spinner}
-        {content}
+        <Online>
+          {errorHere}
+          {spinner}
+          {content}
+        </Online>
+        <Offline>
+          <Error message="You're offline right now. Check your connection." />
+        </Offline>
       </>
     )
   }
@@ -73,13 +69,3 @@ const elem = <App />
 const rootElement = document.getElementById('root')
 const root = createRoot(rootElement)
 root.render(elem)
-
-// const CheckConnected = ({ onChangeConnectionStatus }) => {
-// window.ononline = () => {
-//   onChangeConnectionStatus()
-// }
-
-// window.onoffline = () => {
-//   onChangeConnectionStatus()
-// }
-// }
