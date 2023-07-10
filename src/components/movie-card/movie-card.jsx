@@ -8,13 +8,19 @@ const MovieCard = ({ id, title, date, description, posterPath }) => {
   const imgSrc = `https://image.tmdb.org/t/p/original${posterPath}`
   const alt = `Постер к фильму "${title}" `
 
-  const releaseDate = parseISO(date)
-  const release = format(releaseDate, 'MMMM d, yyyy')
+  let releaseDate = parseISO(date)
+  try {
+    releaseDate = format(releaseDate, 'MMMM d, yyyy')
+  } catch {
+    releaseDate = date
+  }
 
   const shortDescription = getShortDescription()
 
   function getShortDescription() {
-    if (title.length > 21) {
+    if (title.length > 40) {
+      return cutDescription(116)
+    } else if (title.length > 21) {
       return cutDescription(144)
     } else {
       return cutDescription(185)
@@ -37,7 +43,7 @@ const MovieCard = ({ id, title, date, description, posterPath }) => {
       <Image className="movie__img" src={imgSrc} alt={alt} width={183} height={279} />
       <section className="movie__description description">
         <h5 className="description__title">{title}</h5>
-        <div className="description__date">{release}</div>
+        <div className="description__date">{releaseDate}</div>
         <div className="description__genres">
           <div className="genre">Genre</div>
           <div className="genre">Comedy</div>

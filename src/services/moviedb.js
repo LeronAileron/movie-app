@@ -30,17 +30,24 @@ export default class MovieService {
     return await res.json()
   }
 
-  async getTopMovies(page = 1) {
-    let topMovies = await this.getResource(`/movie/top_rated?language=en-US&page=${page}`, this.options)
-    // topMovies = topMovies.results
-    // console.log(topMovies)
-    return topMovies.results.map(this._transformMovie)
+  async getMovies(query, page = 1) {
+    if (query === 'top') query = 'top_rated'
+    let movies = await this.getResource(`/movie/${query}?language=en-US&page=${page}`, this.options)
+    return this.getMoviesAndPages(movies)
   }
 
-  async getPopularMovies(page = 1) {
-    const popularMovies = await this.getResource(`/movie/popular?language=en-US&page=${page}`, this.options)
-    // const popularMovies = res.results
-    console.log(popularMovies)
-    return popularMovies
+  async searchMovies(searchQuery, page = 1) {
+    let movies = await this.getResource(`/search/movie?query=${searchQuery}&language=en-US&page=${page}`, this.options)
+    return this.getMoviesAndPages(movies)
+  }
+
+  getMoviesAndPages = (movies) => {
+    const theMovies = movies.results.map(this._transformMovie)
+    const totalPages = movies['total_pages']
+    movies = {
+      theMovies,
+      totalPages,
+    }
+    return movies
   }
 }

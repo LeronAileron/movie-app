@@ -20,13 +20,17 @@ html, ::after, ::before {
   line-height: inherit;
 }
 
-.main {
+body {
   max-width: 1010px;
+  margin: 21px auto;
+  padding: 17px 36px;
+}
+
+.main {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: space-between;
   padding-top: 21px;
-  margin: 21px auto;
 }
 
 .main--loading {

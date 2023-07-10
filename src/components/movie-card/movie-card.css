@@ -16,7 +16,7 @@
 
 .description {
   padding: 10px 20px;
-  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .description__title {

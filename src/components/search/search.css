@@ -1,0 +1,7 @@
+.search-input {
+  height: 38px;
+}
+
+.search-input::placeholder {
+  font-size: 16px;
+}
