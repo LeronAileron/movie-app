@@ -3,8 +3,21 @@ import { Image } from 'antd'
 import { format, parseISO } from 'date-fns'
 
 import './movie-card.css'
+import RateMovie from '../rate-movie'
+import Genre from '../genre'
 
-const MovieCard = ({ id, title, date, description, posterPath }) => {
+const MovieCard = ({
+  id,
+  title,
+  date,
+  description,
+  posterPath,
+  rating,
+  genreIds,
+  onRateMovie,
+  loadMovies,
+  myRating,
+}) => {
   const imgSrc = `https://image.tmdb.org/t/p/original${posterPath}`
   const alt = `Постер к фильму "${title}" `
 
@@ -38,18 +51,29 @@ const MovieCard = ({ id, title, date, description, posterPath }) => {
     return description
   }
 
+  let color
+  if (rating < 3) {
+    color = '#E90000'
+  } else if (rating < 5) {
+    color = '#E97E00'
+  } else if (rating < 7) {
+    color = '#E9D100'
+  } else {
+    color = '#66E900'
+  }
+
   return (
     <article id={id} className="movie">
       <Image className="movie__img" src={imgSrc} alt={alt} width={183} height={279} />
       <section className="movie__description description">
         <h5 className="description__title">{title}</h5>
         <div className="description__date">{releaseDate}</div>
-        <div className="description__genres">
-          <div className="genre">Genre</div>
-          <div className="genre">Comedy</div>
-          <div className="genre">Historical</div>
-        </div>
+        <Genre genreIds={genreIds} />
         <p className="description__description">{shortDescription}</p>
+        <RateMovie movieId={id} onRateMovie={onRateMovie} loadMovies={loadMovies} myRating={myRating} />
+        <div className="description__rating" style={{ borderColor: color }}>
+          {Math.round(rating * 10) / 10}
+        </div>
       </section>
     </article>
   )

@@ -2,6 +2,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Offline, Online } from 'react-detect-offline'
+import { Tabs } from 'antd'
 
 import './index.css'
 import MovieService from './services/moviedb'
@@ -10,6 +11,9 @@ import Error from './components/error'
 import Spinner from './components/spinner'
 import Search from './components/search'
 import Footer from './components/footer'
+import { MovieServiceProvider } from './context/service-context'
+import { GuestSessionIdProvider } from './context/guest-session-context'
+import { GenresProvider } from './context/genre-context'
 
 class App extends React.Component {
   movieResource = new MovieService()
@@ -22,15 +26,38 @@ class App extends React.Component {
     page: 1,
     totalPages: null,
     isSearching: false,
+    guestSessionId: null,
+    activeTab: 1,
+    genresdb: null,
   }
 
   componentDidMount() {
     this.loadMovies()
+
+    this.movieResource.createGuestSession().then((result) => {
+      this.setState({
+        guestSessionId: result.guest_session_id,
+      })
+    })
+
+    this.movieResource.getGenres().then((genresdb) => {
+      this.setState({
+        genresdb,
+      })
+    })
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.page !== prevState.page) {
-      if (!this.state.isSearching) this.loadMovies()
+    const { page, isSearching, activeTab, guestSessionId } = this.state
+    if (page !== prevState.page || activeTab !== prevState.activeTab) {
+      if (!isSearching || activeTab === 2) {
+        this.loadMovies()
+      }
+    }
+
+    if (guestSessionId !== prevState.guestSessionId) {
+      localStorage.clear()
+      localStorage.setItem('guestSessionId', this.state.guestSessionId)
     }
   }
 
@@ -64,8 +91,15 @@ class App extends React.Component {
 
   loadMovies = () => {
     this.showNotSpinner()
-    const { page } = this.state
-    this.movieResource.getMovies('popular', page).then(this.onMoviesLoaded, this.onErrorWhenLoaded)
+    const { page, activeTab, guestSessionId } = this.state
+
+    if (activeTab == 1) {
+      this.movieResource.getMovies('popular', page).then(this.onMoviesLoaded, this.onErrorWhenLoaded)
+    }
+
+    if (activeTab == 2) {
+      this.movieResource.getRatedMovies(guestSessionId, page).then(this.onMoviesLoaded, this.onErrorWhenLoaded)
+    }
   }
 
   onPaginationChange = (pagPage) => {
@@ -82,12 +116,33 @@ class App extends React.Component {
     this.setState(({ isSearching }) => ({ isSearching: !isSearching }))
   }
 
-  render() {
-    const { error, isLoaded, movies, page, searchError, totalPages, isSearching } = this.state
-    const realTotalPages = totalPages > 500 ? 500 : totalPages
-    // if (totalPages > 500)
+  onTabChange = (activeKey) => {
+    this.setState({
+      activeTab: activeKey,
+    })
+  }
 
-    let noResults, errorHere, spinner, content, footer
+  onRateMovie = (rating, id) => {
+    localStorage.setItem(id, rating)
+  }
+
+  render() {
+    const { error, isLoaded, movies, page, searchError, totalPages, isSearching, activeTab, guestSessionId, genresdb } =
+      this.state
+    const realTotalPages = totalPages > 500 ? 500 : totalPages
+
+    const tabs = [
+      {
+        key: '1',
+        label: `Search`,
+      },
+      {
+        key: '2',
+        label: `Rated`,
+      },
+    ]
+
+    let noResults, errorHere, spinner, content, footer, search
 
     if (searchError) {
       const message = 'По вашему запросу ничего не найдено. Попробуйте еще 🙂'
@@ -95,33 +150,48 @@ class App extends React.Component {
     } else {
       errorHere = error ? <Error message={error.message} type="warning" /> : null
       spinner = !isLoaded ? <Spinner /> : null
-      content = isLoaded && !error ? <MoviesLayout movies={movies} /> : null
+      content =
+        isLoaded && !error ? (
+          <MoviesLayout movies={movies} onRateMovie={this.onRateMovie} loadMovies={this.loadMovies} />
+        ) : null
     }
 
     if (isLoaded && !searchError) {
       footer = <Footer page={page} total={realTotalPages} onPaginationChange={this.onPaginationChange} />
     }
 
+    if (activeTab == 1) {
+      search = (
+        <Search
+          id="search-input"
+          page={page}
+          onMoviesLoaded={this.onMoviesLoaded}
+          onErrorWhenLoaded={this.onErrorWhenLoaded}
+          noResultsError={this.noResultsError}
+          loadMovies={this.loadMovies}
+          showNotSpinner={this.showNotSpinner}
+          isSearching={isSearching}
+          onToggleSearching={this.onToggleSearching}
+          setFirstPage={this.setFirstPage}
+        />
+      )
+    } else if (movies.length == 0) {
+      const message = 'Здесь появятся оцененные вами фильмы 🙂'
+      noResults = <Error message={message} type="info" />
+    }
+
     return (
       <>
         <Online>
-          <header>
-            <Search
-              id="search-input"
-              page={page}
-              onMoviesLoaded={this.onMoviesLoaded}
-              onErrorWhenLoaded={this.onErrorWhenLoaded}
-              noResultsError={this.noResultsError}
-              loadMovies={this.loadMovies}
-              showNotSpinner={this.showNotSpinner}
-              isSearching={isSearching}
-              onToggleSearching={this.onToggleSearching}
-              setFirstPage={this.setFirstPage}
-            />
-          </header>
+          <Tabs className="tabs" defaultActiveKey="1" items={tabs} onChange={this.onTabChange} page={page} />
+          <header>{search}</header>
           {errorHere}
           {spinner}
-          {content}
+          <MovieServiceProvider value={this.movieResource}>
+            <GuestSessionIdProvider value={guestSessionId}>
+              <GenresProvider value={genresdb}>{content}</GenresProvider>
+            </GuestSessionIdProvider>
+          </MovieServiceProvider>
           {noResults}
           {footer}
         </Online>

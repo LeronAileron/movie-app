@@ -1,7 +1,7 @@
 .movie {
+  position: relative;
   width: 451px;
   height: 279px;
-  /* background-color: aqua; */
   display: flex;
   margin-bottom: 37px;
   box-shadow: 0px 4px 12px 0px #00000026;
@@ -20,6 +20,7 @@
 }
 
 .description__title {
+  max-width: 205px;
   font-size: 20px;
   line-height: 28px;
   margin-bottom: 7px;
@@ -51,6 +52,23 @@
 }
 
 .description__description {
-  overflow: hidden;
-  height: 129px;
+  overflow-y: scroll;
+  height: 110px;
+}
+
+.description__rating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border:2px solid;
+  text-align: center;
+  line-height: 30px;
+}
+
+.description__toRate {
+  position: absolute;
+  bottom: 15px;
 }

@@ -1,7 +1,7 @@
 export default class MovieService {
   _apiBase = 'https://api.themoviedb.org/3'
 
-  options = {
+  getOptions = {
     method: 'GET',
     headers: {
       accept: 'application/json',
@@ -10,6 +10,8 @@ export default class MovieService {
     },
   }
 
+  apiKey = '1c34afba0588019a46b2070da94e7a2e'
+
   _transformMovie(movie) {
     return {
       id: movie.id,
@@ -17,27 +19,29 @@ export default class MovieService {
       posterPath: movie.poster_path,
       date: movie.release_date,
       overview: movie.overview,
+      currentRating: movie.vote_average,
+      genreIds: movie.genre_ids,
+      // myRating: movie.rating || 0,
     }
   }
 
   async getResource(url, options) {
-    const res = await fetch(`${this._apiBase}${url}`, options)
+    const res = await fetch(`${this._apiBase}${url}`, options || this.getOptions)
 
     if (!res.ok) {
-      console.log(res.statusText)
       throw new Error(`Данные не загружены. Код ошибки ${res.status}`)
     }
     return await res.json()
   }
 
-  async getMovies(query, page = 1) {
+  async getMovies(query = 'popular', page = 1) {
     if (query === 'top') query = 'top_rated'
-    let movies = await this.getResource(`/movie/${query}?language=en-US&page=${page}`, this.options)
+    let movies = await this.getResource(`/movie/${query}?language=en-US&page=${page}`)
     return this.getMoviesAndPages(movies)
   }
 
   async searchMovies(searchQuery, page = 1) {
-    let movies = await this.getResource(`/search/movie?query=${searchQuery}&language=en-US&page=${page}`, this.options)
+    let movies = await this.getResource(`/search/movie?query=${searchQuery}&language=en-US&page=${page}`)
     return this.getMoviesAndPages(movies)
   }
 
@@ -49,5 +53,58 @@ export default class MovieService {
       totalPages,
     }
     return movies
+  }
+
+  async createGuestSession() {
+    const url = `${this._apiBase}/authentication/guest_session/new`
+    const res = await fetch(url, this.getOptions)
+
+    if (!res.ok) {
+      console.log('не получилось создать гостевую сессию')
+    }
+    return await res.json()
+  }
+
+  async getRatedMovies(guestSessionId) {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+      },
+    }
+    const ratedMovies = await this.getResource(
+      `/guest_session/${guestSessionId}/rated/movies?api_key=${this.apiKey}`,
+      options
+    )
+
+    console.log(ratedMovies)
+    return this.getMoviesAndPages(ratedMovies)
+  }
+
+  async rateMovie(rating, movieId, guestSessionId) {
+    const options = {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({ value: rating }),
+    }
+
+    const res = await fetch(
+      `https://api.themoviedb.org/3/movie/${movieId}/rating?api_key=${this.apiKey}&guest_session_id=${guestSessionId}`,
+      options
+    )
+    if (!res.ok) {
+      console.log(`Не удается поставить оценку. Код ошибки ${res.status}`)
+    }
+    const result = await res.json()
+    return result
+  }
+
+  async getGenres() {
+    const genresToFormat = await this.getResource('/genre/movie/list')
+    const genres = genresToFormat.genres
+    return genres
   }
 }

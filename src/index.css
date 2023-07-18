@@ -36,3 +36,10 @@ body {
 .main--loading {
   padding-top: 100px;
 }
+
+.tabs {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0 10px;
+  font-size: 14px;
+}
