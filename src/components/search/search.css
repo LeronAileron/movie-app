@@ -5,3 +5,11 @@
 .search-input::placeholder {
   font-size: 16px;
 }
+
+@media (max-width: 840px) {
+  .search-input {
+    max-width: 388px;
+    display: block;
+    margin: 0 auto;
+  }
+}

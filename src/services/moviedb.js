@@ -21,7 +21,6 @@ export default class MovieService {
       overview: movie.overview,
       currentRating: movie.vote_average,
       genreIds: movie.genre_ids,
-      // myRating: movie.rating || 0,
     }
   }
 
@@ -77,7 +76,6 @@ export default class MovieService {
       options
     )
 
-    console.log(ratedMovies)
     return this.getMoviesAndPages(ratedMovies)
   }
 

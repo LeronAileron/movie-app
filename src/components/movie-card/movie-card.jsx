@@ -31,6 +31,10 @@ const MovieCard = ({
   const shortDescription = getShortDescription()
 
   function getShortDescription() {
+    if (document.documentElement.clientWidth < 970) {
+      return cutDescription(240)
+    }
+
     if (title.length > 40) {
       return cutDescription(116)
     } else if (title.length > 21) {
@@ -51,6 +55,11 @@ const MovieCard = ({
     return description
   }
 
+  let fontClass
+  if (title.length > 22) {
+    fontClass = 'description__title--smaller'
+  }
+
   let color
   if (rating < 3) {
     color = '#E90000'
@@ -64,11 +73,15 @@ const MovieCard = ({
 
   return (
     <article id={id} className="movie">
-      <Image className="movie__img" src={imgSrc} alt={alt} width={183} height={279} />
+      <div className="movie__poster-wrapper">
+        <Image className="movie__img" src={imgSrc} alt={alt} />
+      </div>
       <section className="movie__description description">
-        <h5 className="description__title">{title}</h5>
-        <div className="description__date">{releaseDate}</div>
-        <Genre genreIds={genreIds} />
+        <div className="movie-info-sm">
+          <h5 className={`description__title ${fontClass}`}>{title}</h5>
+          <div className="description__date">{releaseDate}</div>
+          <Genre genreIds={genreIds} />
+        </div>
         <p className="description__description">{shortDescription}</p>
         <RateMovie movieId={id} onRateMovie={onRateMovie} loadMovies={loadMovies} myRating={myRating} />
         <div className="description__rating" style={{ borderColor: color }}>

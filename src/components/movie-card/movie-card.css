@@ -9,12 +9,19 @@
   overflow: hidden;
 }
 
+.movie__poster-wrapper div:first-child,
+.movie__poster-wrapper div:first-child img {
+  height: inherit;
+}
+
 .movie__img {
   min-width: 183px;
   display: block;
+  width: 183px;
+  height: 279px;
 }
 
-.description {
+.movie__description {
   padding: 10px 20px;
   overflow-y: hidden;
 }
@@ -54,6 +61,7 @@
 .description__description {
   overflow-y: scroll;
   height: 110px;
+  grid-area: descrip;
 }
 
 .description__rating {
@@ -71,4 +79,63 @@
 .description__toRate {
   position: absolute;
   bottom: 15px;
+  grid-area: stars;
+}
+
+.movie-info-sm {
+  grid-area: info;
+}
+
+.movie__poster-wrapper {
+  width: 183px;
+  height: 100%;
+}
+
+@media (max-width: 840px) {
+  .movie {
+    width: 388px;
+    height: 245px;
+    padding: 10px 6px;
+    border-radius: 0;
+  }
+
+  .movie__description {
+    width: 100%;
+    padding: 0;
+    display: grid;
+    gap: 5px 13px;
+    grid-template-columns: 60px 1fr 239px;
+    grid-template-rows: 91px 92px 1fr;
+    grid-template-areas: 
+      ". info info"
+      "descrip descrip descrip"
+      ". stars stars";
+  }
+
+  .movie__poster-wrapper {
+    position: absolute;
+    grid-area: poster;
+    width: 60px;
+    height: 91px;
+  }
+
+  .movie__img {
+    min-width: 60px;
+  }
+
+  .description__title {
+    max-width: 270px;
+  }
+
+  .description__title--smaller {
+    font-size: 15px;
+  }
+
+  .description__toRate {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
 }

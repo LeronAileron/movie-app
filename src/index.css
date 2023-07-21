@@ -43,3 +43,11 @@ body {
   padding: 0 10px;
   font-size: 14px;
 }
+
+@media (max-width: 840px) {
+  .main {
+    margin: 0 auto;
+    padding: 16px 20px;
+    justify-content: center;
+  }
+}

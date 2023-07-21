@@ -1,11 +1,13 @@
 /* eslint-disable quotes */
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+// import { Online } from 'react-detect-offline'
 import { Offline, Online } from 'react-detect-offline'
 import { Tabs } from 'antd'
 
 import './index.css'
 import MovieService from './services/moviedb'
+// import DummyService from './services/dummydb'
 import MoviesLayout from './components/movies-layout'
 import Error from './components/error'
 import Spinner from './components/spinner'
@@ -38,6 +40,7 @@ class App extends React.Component {
       this.setState({
         guestSessionId: result.guest_session_id,
       })
+      localStorage.clear()
     })
 
     this.movieResource.getGenres().then((genresdb) => {
@@ -50,13 +53,16 @@ class App extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const { page, isSearching, activeTab, guestSessionId } = this.state
     if (page !== prevState.page || activeTab !== prevState.activeTab) {
-      if (!isSearching || activeTab === 2) {
+      if (!isSearching || activeTab == 2) {
         this.loadMovies()
       }
     }
 
+    if (activeTab !== prevState.activeTab) {
+      this.setState({ isSearching: false })
+    }
+
     if (guestSessionId !== prevState.guestSessionId) {
-      localStorage.clear()
       localStorage.setItem('guestSessionId', this.state.guestSessionId)
     }
   }
@@ -95,6 +101,7 @@ class App extends React.Component {
 
     if (activeTab == 1) {
       this.movieResource.getMovies('popular', page).then(this.onMoviesLoaded, this.onErrorWhenLoaded)
+      // this.dummyResource.getMovies().then(this.onMoviesLoaded, this.onErrorWhenLoaded)
     }
 
     if (activeTab == 2) {
