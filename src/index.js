@@ -1,13 +1,11 @@
 /* eslint-disable quotes */
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-// import { Online } from 'react-detect-offline'
 import { Offline, Online } from 'react-detect-offline'
 import { Tabs } from 'antd'
 
 import './index.css'
 import MovieService from './services/moviedb'
-// import DummyService from './services/dummydb'
 import MoviesLayout from './components/movies-layout'
 import Error from './components/error'
 import Spinner from './components/spinner'
