@@ -20,10 +20,8 @@ class Search extends React.Component {
   componentDidUpdate(prevProps) {
     const { page, isSearching } = this.props
     const { searchingFor } = this.state
-    if (isSearching) {
-      if (page !== prevProps.page) {
-        this.handleSearchInput(searchingFor)
-      }
+    if (isSearching && page !== prevProps.page) {
+      this.handleSearchInput(searchingFor)
     }
   }
 

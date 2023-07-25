@@ -6,10 +6,8 @@ const Genre = ({ genreIds = [] }) => {
   return (
     <GenresConsumer>
       {(genresdb) => {
-        let genres
-
         if (genresdb === null) return
-        genres = genreIds.map((id) => {
+        const genres = genreIds.map((id) => {
           const theGenreEl = genresdb.find((genre) => genre.id === id)
           const genre = theGenreEl.name ? theGenreEl.name : 'genre'
 

@@ -76,6 +76,22 @@
   line-height: 30px;
 }
 
+.description__rating--worst {
+  border-color: #E90000;
+}
+
+.description__rating--bad {
+  border-color: #E97E00;
+}
+
+.description__rating--good {
+  border-color: #E9D100;
+}
+
+.description__rating--excellent {
+  border-color: #66E900;
+}
+
 .description__toRate {
   position: absolute;
   bottom: 15px;

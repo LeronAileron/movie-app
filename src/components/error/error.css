@@ -1,7 +1,10 @@
-.main--error {
+.error {
+  display: block;
   width: 60%;
-  /* height: 400px; */
-  margin: 0 auto;
   font-size: 20px;
-  /* border: none; */
+  padding-top: 21px;
+}
+
+.error--centred {
+  margin: 0 auto;
 }

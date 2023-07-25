@@ -1,6 +1,7 @@
 import React from 'react'
 import { Image } from 'antd'
 import { format, parseISO } from 'date-fns'
+import classNames from 'classnames'
 
 import './movie-card.css'
 import RateMovie from '../rate-movie'
@@ -35,24 +36,7 @@ const MovieCard = ({
       return cutDescription(240)
     }
 
-    if (title.length > 40) {
-      return cutDescription(116)
-    } else if (title.length > 21) {
-      return cutDescription(144)
-    } else {
-      return cutDescription(185)
-    }
-  }
-
-  function cutDescription(stop) {
-    for (stop; stop < stop + 50; stop++) {
-      if (description.length < stop) break
-      if (description.at(stop) === ' ') {
-        description = description.slice(0, stop).concat('...')
-        break
-      }
-    }
-    return description
+    return cutIfLength(title, description)
   }
 
   let fontClass
@@ -60,16 +44,12 @@ const MovieCard = ({
     fontClass = 'description__title--smaller'
   }
 
-  let color
-  if (rating < 3) {
-    color = '#E90000'
-  } else if (rating < 5) {
-    color = '#E97E00'
-  } else if (rating < 7) {
-    color = '#E9D100'
-  } else {
-    color = '#66E900'
-  }
+  const ratingClasses = classNames('description__rating', {
+    'description__rating--worst': rating < 3,
+    'description__rating--bad': rating >= 3 && rating < 5,
+    'description__rating--good': rating >= 5 && rating < 7,
+    'description__rating--excellent': rating >= 7,
+  })
 
   return (
     <article id={id} className="movie">
@@ -84,12 +64,33 @@ const MovieCard = ({
         </div>
         <p className="description__description">{shortDescription}</p>
         <RateMovie movieId={id} onRateMovie={onRateMovie} loadMovies={loadMovies} myRating={myRating} />
-        <div className="description__rating" style={{ borderColor: color }}>
-          {Math.round(rating * 10) / 10}
-        </div>
+        <div className={ratingClasses}>{Math.round(rating * 10) / 10}</div>
       </section>
     </article>
   )
 }
 
 export default MovieCard
+
+function cutIfLength(title, description) {
+  let stop
+  if (title.length > 40) {
+    stop = 116
+  } else if (title.length > 21) {
+    stop = 144
+  } else {
+    stop = 185
+  }
+  return cutDescription(stop, description)
+}
+
+function cutDescription(stop, description) {
+  for (stop; stop < stop + 50; stop++) {
+    if (description.length < stop) break
+    if (description.at(stop) === ' ') {
+      description = description.slice(0, stop).concat('...')
+      break
+    }
+  }
+  return description
+}

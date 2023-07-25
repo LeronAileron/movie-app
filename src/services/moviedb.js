@@ -26,7 +26,6 @@ export default class MovieService {
 
   async getResource(url, options) {
     const res = await fetch(`${this._apiBase}${url}`, options || this.getOptions)
-
     if (!res.ok) {
       throw new Error(`Данные не загружены. Код ошибки ${res.status}`)
     }

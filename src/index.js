@@ -34,18 +34,24 @@ class App extends React.Component {
   componentDidMount() {
     this.loadMovies()
 
-    this.movieResource.createGuestSession().then((result) => {
-      this.setState({
-        guestSessionId: result.guest_session_id,
+    this.movieResource
+      .createGuestSession()
+      .then((result) => {
+        this.setState({
+          guestSessionId: result.guest_session_id,
+        })
+        localStorage.clear()
       })
-      localStorage.clear()
-    })
+      .catch((err) => <Error message={`не получилось создать гостевую сессию, объект ошибки: ${err}`} />)
 
-    this.movieResource.getGenres().then((genresdb) => {
-      this.setState({
-        genresdb,
+    this.movieResource
+      .getGenres()
+      .then((genresdb) => {
+        this.setState({
+          genresdb,
+        })
       })
-    })
+      .catch((err) => <Error message={`не смогли получить жанры, объект ошибки: ${err}`} />)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -63,6 +69,12 @@ class App extends React.Component {
     if (guestSessionId !== prevState.guestSessionId) {
       localStorage.setItem('guestSessionId', this.state.guestSessionId)
     }
+  }
+
+  componentDidCatch(error, info) {
+    console.log('error: ', error)
+    console.log('info: ', info)
+    this.setState({ error })
   }
 
   onMoviesLoaded = (movies) => {
